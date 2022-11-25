@@ -60,6 +60,16 @@ def get_weather(region):
     wind_dir = response["now"]["windDir"]
     return weather, temp, wind_dir
 
+#随机笑话
+def xiao():
+    key = 'd4799037a0b583d39716318b36a02fa0'
+    sum = random.randrange(1,21)
+    url = 'http://v.juhe.cn/joke/content/list.php?key={}&page={}&pagesize=10&sort=asc&time=1418745237'.format(key,sum)
+    response = get(url).json()
+    dat = response['result']['data']
+    for i in dat:
+        content = i['content']
+        return content
 
 def get_birthday(birthday, year, today):
     birthday_year = birthday.split("-")[0]
@@ -115,7 +125,7 @@ def get_ciba():
     return note_ch, note_en
 
 
-def send_message(to_user, access_token, region_name, weather, temp, wind_dir, note_ch, note_en):
+def send_message(to_user, access_token, region_name, weather, temp, wind_dir, note_ch, note_en, content):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -172,6 +182,10 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
             "note_ch": {
                 "value": note_ch,
                 "color": get_color()
+            },
+            "content": {
+                "value": content,
+                "color": get_color()
             }
         }
     }
@@ -227,7 +241,8 @@ if __name__ == "__main__":
     if note_ch == "" and note_en == "":
         # 获取词霸每日金句
         note_ch, note_en = get_ciba()
+    content = xiao()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, region, weather, temp, wind_dir, note_ch, note_en)
+        send_message(user, accessToken, region, weather, temp, wind_dir, note_ch, note_en, content)
     os.system("pause")
